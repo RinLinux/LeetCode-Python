@@ -21,5 +21,5 @@ class Solution:
         return all_s
 
 s = Solution()
-print(s.climbStairs(4))
+print(s.climbStairs(10))
 
