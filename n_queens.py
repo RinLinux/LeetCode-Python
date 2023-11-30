@@ -53,5 +53,5 @@ class Solution:
 
 if __name__ == '__main__':
     s = Solution()
-    result = s.solveNQueens(4)
+    result = s.solveNQueens(5)
     print(result)
