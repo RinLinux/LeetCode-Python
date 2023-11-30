@@ -11,10 +11,9 @@ class Solution:
                     DFS(queens+[c], xy_diff + [r-c], xy_sum + [r+c])
         
         DFS([],[],[])
-        return res
-        # return [["." * i + "Q" + "." * (n-i-1) for i in x ] for x in res]
+        return [["." * i + "Q" + "." * (n-i-1) for i in x ] for x in res]
 
 if __name__ == '__main__':
     s = Solution()
-    result = s.solveNQueens(14)
+    result = s.solveNQueens(5)
     print(len(result))
