@@ -19,7 +19,7 @@ class Solution:
 
     def solver(self, n, row, current_state):
 
-        if row >= n:
+        if row == n:
             self.res.append(current_state)
             return
 
