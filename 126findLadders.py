@@ -5,7 +5,8 @@ class Solution:
 
     def findLadders(self, beginWord: str, endWord: str, wordList: list[str]) -> list[list[str]]:
         words = set(wordList)
-        if endWord not in words: return []
+        if endWord not in words:
+            return []
         dic = collections.defaultdict(list)
         n = len(wordList[0])
         for w in words:
