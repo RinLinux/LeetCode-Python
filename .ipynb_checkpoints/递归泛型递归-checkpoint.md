@@ -1,0 +1,1093 @@
+# 递归泛型递归
+
+
+
+泛型递归Python代码模板
+
+```python
+def recursion(level, param1,param2,...):
+    # recursion terminator
+    if level > MAX_LEVEL: 
+        process_result
+        return
+    
+    # process logic in current level
+    process(level, data, ...)
+    
+    # drill down
+    self.recursion(level+1, p1, p2,...)
+    
+    # reverse the current level status if needed
+```
+
+
+
+## [70. 爬楼梯](https://leetcode.cn/problems/climbing-stairs/)
+
+假设你正在爬楼梯。需要 n 阶你才能到达楼顶。
+
+每次你可以爬 1 或 2 个台阶。你有多少种不同的方法可以爬到楼顶呢？
+
+示例 1：
+
+输入：n = 2
+输出：2
+解释：有两种方法可以爬到楼顶。
+
+1. 1 阶 + 1 阶
+2. 2 阶
+示例 2：
+
+输入：n = 3
+输出：3
+解释：有三种方法可以爬到楼顶。
+
+1. 1 阶 + 1 阶 + 1 阶
+2. 1 阶 + 2 阶
+3. 2 阶 + 1 阶
+
+提示：
+
+1 <= n <= 45
+
+
+
+```python
+class Solution:
+    def climbStairs(self, n: int) -> int:
+        if n <= 2: return n
+        f1, f2, f3 = 1, 2, 3
+
+        for i in range(3,n+1):
+            f3 = f1 + f2
+            f1 = f2
+            f2 = f3
+        
+        return f3
+```
+
+
+
+## [22.括号生成](https://leetcode.cn/problems/generate-parentheses/)
+
+数字 `n` 代表生成括号的对数，请你设计一个函数，用于能够生成所有可能的并且 **有效的** 括号组合。
+
+ 
+
+**示例 1：**
+
+```
+输入：n = 3
+输出：["((()))","(()())","(())()","()(())","()()()"]
+```
+
+**示例 2：**
+
+```
+输入：n = 1
+输出：["()"]
+```
+
+ 
+
+**提示：**
+
+- `1 <= n <= 8`
+
+
+
+```python
+class Solution:
+    def generateParenthesis(self, n: int) -> List[str]:
+        res = []
+        cur_str = ''
+
+        def dfs(left, right, n, cur_str):
+            if left == n and right == n:
+                res.append(cur_str)
+                return
+            
+            if left < n:
+                dfs(left+1, right, n, cur_str + '(')
+            if left > right:
+                dfs(left, right+1, n, cur_str + ')')
+        
+        dfs(0, 0, n, cur_str)
+
+        return res
+```
+
+
+
+
+
+```python
+class Solution:
+    def generateParenthesis(self, n: int) -> List[str]:
+        m = n * 2
+        res = []
+        path = [''] * m
+
+        def dfs(i, open):
+            if i == m:
+                res.append(''.join(path))
+                return 
+            if open < n:
+                path[i] = '('
+                dfs(i+1, open+1)
+            if i - open < open:
+                path[i] = ')'
+                dfs(i+1, open)
+        
+        dfs(0,0)
+        return res
+```
+
+
+
+## [226. 翻转二叉树](https://leetcode.cn/problems/invert-binary-tree/)
+
+给你一棵二叉树的根节点 `root` ，翻转这棵二叉树，并返回其根节点。
+
+
+
+##### 利用栈
+
+```python
+
+# Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution:
+    def invertTree(self, root: Optional[TreeNode]) -> Optional[TreeNode]:
+        if not root: return
+        stack = [root]
+        while stack:
+            node = stack.pop()
+            if node.left: stack.append(node.left)
+            if node.right: stack.append(node.right)
+
+            node.left, node.right = node.right, node.left
+
+        return root
+```
+
+
+
+##### 使用python特性，纯递归
+
+```python
+# Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution:
+    def invertTree(self, root: Optional[TreeNode]) -> Optional[TreeNode]:
+        if not root: return
+        
+        root.left, root.right = self.invertTree(root.right), self.invertTree(root.left)
+```
+
+
+
+
+
+
+
+## [98.验证二叉搜索树](https://leetcode.cn/problems/validate-binary-search-tree/)
+
+给你一个二叉树的根节点 `root` ，判断其是否是一个有效的二叉搜索树。
+
+**有效** 二叉搜索树定义如下：
+
+- 节点的左子树只包含 **小于** 当前节点的数。
+- 节点的右子树只包含 **大于** 当前节点的数。
+- 所有左子树和右子树自身必须也是二叉搜索树。
+
+##### 前序遍历
+
+```python
+
+# Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution:
+    def isValidBST(self, root: Optional[TreeNode],left=-inf,right=inf) -> bool:
+        if not root: return True
+        x = root.val
+        return left < x < right and self.isValidBST(root.left,left,x) and self.isValidBST(root.right,x,right)
+```
+
+
+
+##### 中序遍历
+
+```python
+# Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution:
+    pre = -inf
+    def isValidBST(self, root: Optional[TreeNode]) -> bool:
+        if not root: return True
+        if not self.isValidBST(root.left):
+            return False
+        if root.val <= self.pre:
+            return False
+        self.pre = root.val
+        return self.isValidBST(root.right)
+```
+
+
+
+##### 后序遍历（我也没看懂这个解法）[视频](https://www.bilibili.com/video/BV14G411P7C1)
+
+```python
+# Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution:
+    def isValidBST(self, root: Optional[TreeNode]) -> bool:
+        def f(node):
+            if not node: return inf, -inf
+            l_min, l_max = f(node.left)
+            r_min, r_max = f(node.right)
+            x = node.val
+            if x <= l_max or x >= r_min:
+                return -inf, inf
+            return min(l_min,x), max(r_max,x)
+        return f(root)[1] != inf
+```
+
+
+
+## [104. 二叉树的最大深度](https://leetcode.cn/problems/maximum-depth-of-binary-tree/)
+
+给定一个二叉树 `root` ，返回其最大深度。
+
+二叉树的 **最大深度** 是指从根节点到最远叶子节点的最长路径上的节点数。
+
+```python
+# Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution:
+    def maxDepth(self, root: Optional[TreeNode]) -> int:
+        if not root: return 0
+
+        l_depth = self.maxDepth(root.left)
+        r_depth = self.maxDepth(root.right)
+
+        return max(l_depth,r_depth) + 1
+
+```
+
+
+
+## [111. 二叉树的最小深度](https://leetcode.cn/problems/minimum-depth-of-binary-tree/)
+
+给定一个二叉树，找出其最小深度。
+
+最小深度是从根节点到最近叶子节点的最短路径上的节点数量。
+
+**说明：**叶子节点是指没有子节点的节点。
+
+
+
+```python
+# Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution:
+    def minDepth(self, root: Optional[TreeNode]) -> int:
+        if not root: return 0
+
+        if not root.left and not root.right: return 1
+
+        leftMindepth = self.minDepth(root.left)
+        rightMindepth = self.minDepth(root.right)
+
+        if root.left and  not root.right: return leftMindepth + 1
+        if not root.left and root.right: return rightMindepth + 1
+
+        return min(leftMindepth, rightMindepth) + 1
+```
+
+
+
+## [297. 二叉树的序列化与反序列化](https://leetcode.cn/problems/serialize-and-deserialize-binary-tree/)
+
+序列化是将一个数据结构或者对象转换为连续的比特位的操作，进而可以将转换后的数据存储在一个文件或者内存中，同时也可以通过网络传输到另一个计算机环境，采取相反方式重构得到原数据。
+
+请设计一个算法来实现二叉树的序列化与反序列化。这里不限定你的序列 / 反序列化算法执行逻辑，你只需要保证一个二叉树可以被序列化为一个字符串并且将这个字符串反序列化为原始的树结构。
+
+**提示:** 输入输出格式与 LeetCode 目前使用的方式一致，详情请参阅 [LeetCode 序列化二叉树的格式](https://leetcode.cn/faq/#binary-tree)。你并非必须采取这种方式，你也可以采用其他的方法解决这个问题。
+
+
+
+```python
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, x):
+#         self.val = x
+#         self.left = None
+#         self.right = None
+
+class Codec:
+
+    def serialize(self, root):
+        """Encodes a tree to a single string.
+        
+        :type root: TreeNode
+        :rtype: str
+        """
+        if not root: return ""
+        queue = deque([root])
+        res = []
+        while queue:
+            node = queue.popleft()
+            if node:
+                res.append(str(node.val))
+                queue.append(node.left)
+                queue.append(node.right)
+            else:
+                res.append('None')
+        
+        return '[' + ','.join(res) + ']'
+
+
+        
+
+    def deserialize(self, data):
+        """Decodes your encoded data to tree.
+        
+        :type data: str
+        :rtype: TreeNode
+        """
+        if not data: return []
+
+        datalist = data[1:-1].split(',')
+        root = TreeNode(int(datalist[0]))
+        queue = deque([root])
+        i = 1
+        while queue:
+            node = queue.popleft()
+            if datalist[i] != 'None':
+                node.left = TreeNode(int(datalist[i]))
+                queue.append(node.left)
+            i += 1
+            if datalist[i] != 'None':
+                node.right = TreeNode(int(datalist[i]))
+                queue.append(node.right)
+            i += 1
+        
+        return root
+
+
+        
+
+# Your Codec object will be instantiated and called as such:
+# ser = Codec()
+# deser = Codec()
+# ans = deser.deserialize(ser.serialize(root))
+```
+
+
+
+
+
+## [236. 二叉树的最近公共祖先](https://leetcode.cn/problems/lowest-common-ancestor-of-a-binary-tree/)
+
+给定一个二叉树, 找到该树中两个指定节点的最近公共祖先。
+
+[百度百科](https://baike.baidu.com/item/最近公共祖先/8918834?fr=aladdin)中最近公共祖先的定义为：“对于有根树 T 的两个节点 p、q，最近公共祖先表示为一个节点 x，满足 x 是 p、q 的祖先且 x 的深度尽可能大（**一个节点也可以是它自己的祖先**）。”
+
+
+
+**提示：**
+
+- 树中节点数目在范围 `[2, 105]` 内。
+- `-109 <= Node.val <= 109`
+- 所有 `Node.val` `互不相同` 。
+- `p != q`
+- `p` 和 `q` 均存在于给定的二叉树中。
+
+
+
+```python
+# Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, x):
+#         self.val = x
+#         self.left = None
+#         self.right = None
+
+class Solution:
+    def lowestCommonAncestor(self, root: 'TreeNode', p: 'TreeNode', q: 'TreeNode') -> 'TreeNode':
+        if root is None or p is root or q is root: return root
+        left = self.lowestCommonAncestor(root.left, p, q)
+        right = self.lowestCommonAncestor(root.right, p, q)
+        if left and right: return root
+        if not left: return right
+        if not right: return left 
+```
+
+
+
+## [105. 从前序与中序遍历序列构造二叉树](https://leetcode.cn/problems/construct-binary-tree-from-preorder-and-inorder-traversal/)
+
+给定两个整数数组 `preorder` 和 `inorder` ，其中 `preorder` 是二叉树的**先序遍历**， `inorder` 是同一棵树的**中序遍历**，请构造二叉树并返回其根节点。
+
+**提示:**
+
+- `1 <= preorder.length <= 3000`
+- `inorder.length == preorder.length`
+- `-3000 <= preorder[i], inorder[i] <= 3000`
+- `preorder` 和 `inorder` 均 **无重复** 元素
+- `inorder` 均出现在 `preorder`
+- `preorder` **保证** 为二叉树的前序遍历序列
+- `inorder` **保证** 为二叉树的中序遍历序列
+
+```python
+# Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution:
+    def buildTree(self, preorder: List[int], inorder: List[int]) -> Optional[TreeNode]:
+        def recur(root, left, right):
+            if left > right: return
+            node = TreeNode(preorder[root])
+            i = dic[preorder[root]]
+
+            node.left = recur(root + 1, left, i - 1)
+            node.right = recur(i - left + root + 1, i + 1, right)
+
+            return node
+
+        dic = {}
+        for i in range(len(inorder)):
+            dic[inorder[i]] = i
+        
+        return recur(0, 0, len(inorder) - 1)
+```
+
+
+
+## [17. 电话号码的字母组合](https://leetcode.cn/problems/letter-combinations-of-a-phone-number/)
+
+给定一个仅包含数字 `2-9` 的字符串，返回所有它能表示的字母组合。答案可以按 **任意顺序** 返回。
+
+给出数字到字母的映射如下（与电话按键相同）。注意 1 不对应任何字母。
+
+**提示：**
+
+- `0 <= digits.length <= 4`
+- `digits[i]` 是范围 `['2', '9']` 的一个数字。
+
+
+
+##### 深度优先
+
+```python
+class Solution:
+    def letterCombinations(self, digits: str) -> List[str]:
+        mapping = ["","","abc","def","ghi","jkl","mno","pqrs","tuv","wxzy"]
+        n = len(digits)
+        if not n: return []
+        res = []
+        path = [''] * n
+        def dfs(i):
+            if i == n:
+                res.append(''.join(path))
+                return
+            for c in mapping[int(digits[i])]:
+                path[i] = c
+                dfs(i+1)
+        
+        dfs(0)
+        return res
+```
+
+
+
+##### 使用回溯
+
+```python
+class Solution:
+    def letterCombinations(digits: str) -> list:
+        if not digits:
+            return []
+        phone = {'2': ['a', 'b', 'c'],
+                 '3': ['d', 'e', 'f'],
+                 '4': ['g', 'h', 'i'],
+                 '5': ['j', 'k', 'l'],
+                 '6': ['m', 'n', 'o'],
+                 '7': ['p', 'q', 'r', 's'],
+                 '8': ['t', 'u', 'v'],
+                 '9': ['w', 'x', 'y', 'z']}
+
+        def backtrack(combination: str, nextdigits: str):
+            if len(nextdigits) == 0:
+                res.append(combination)
+            else:
+                for letter in phone[nextdigits[0]]:
+                    backtrack(combination + letter, nextdigits[1:])
+		res = []
+        backtrack('', digits)
+        return res
+```
+
+
+
+##### 使用**队列**
+
+```python
+class Solution:
+    def letterCombinations(self, digits: str) -> List[str]:
+        if not digits:
+            return []
+        phone = ['abc', 'def', 'ghi', 'jkl', 'mno', 'pqrs', 'tuv', 'wxyz']
+        queue = ['']
+        for digit in digits:
+            for _ in range(len(queue)):
+                tmp = queue.pop(0)
+                for letter in phone[ord(digit) - 50]:  # 不使用 int() 转换字符串，使用ASCII码
+                    queue.append(tmp + letter)
+        return queue
+```
+
+
+
+
+
+
+
+## [77. 组合](https://leetcode.cn/problems/combinations/)
+
+给定两个整数 `n` 和 `k`，返回范围 `[1, n]` 中所有可能的 `k` 个数的组合。
+
+你可以按 **任何顺序** 返回答案。
+
+
+
+**提示：**
+
+- `1 <= n <= 20`
+- `1 <= k <= n`
+
+
+
+
+
+```python
+class Solution:
+    def combine(self, n: int, k: int) -> List[List[int]]:
+        res = []
+        path = []
+
+        def dfs(i):
+            d = k - len(path)
+            if len(path) == k:
+                res.append(path.copy())
+                return
+
+            for j in range(i, d - 1, -1):
+                path.append(j)
+                dfs(j-1)
+                path.pop()
+        
+        dfs(n)
+        return res
+```
+
+
+
+## [39. 组合总和](https://leetcode.cn/problems/combination-sum/)
+
+
+
+给你一个 **无重复元素** 的整数数组 `candidates` 和一个目标整数 `target` ，找出 `candidates` 中可以使数字和为目标数 `target` 的 所有 **不同组合** ，并以列表形式返回。你可以按 **任意顺序** 返回这些组合。
+
+`candidates` 中的 **同一个** 数字可以 **无限制重复被选取** 。如果至少一个数字的被选数量不同，则两种组合是不同的。 
+
+对于给定的输入，保证和为 `target` 的不同组合数少于 `150` 个。
+
+ 
+
+**示例 1：**
+
+```
+输入：candidates = [2,3,6,7], target = 7
+输出：[[2,2,3],[7]]
+解释：
+2 和 3 可以形成一组候选，2 + 2 + 3 = 7 。注意 2 可以使用多次。
+7 也是一个候选， 7 = 7 。
+仅有这两种组合。
+```
+
+**示例 2：**
+
+```
+输入: candidates = [2,3,5], target = 8
+输出: [[2,2,2,2],[2,3,3],[3,5]]
+```
+
+**示例 3：**
+
+```
+输入: candidates = [2], target = 1
+输出: []
+```
+
+ 
+
+**提示：**
+
+- `1 <= candidates.length <= 30`
+- `2 <= candidates[i] <= 40`
+- `candidates` 的所有元素 **互不相同**
+- `1 <= target <= 40`
+
+
+
+```python
+class Solution:
+    def combinationSum(self, candidates: List[int], target: int) -> List[List[int]]:
+        res = []
+        path = []
+        candidates.sort()
+        n = len(candidates)
+
+        def dfs(i,t):
+            if t == 0:
+                res.append(path.copy())
+                return
+            
+            for j in range(i,n):
+                if t - candidates[i] < 0:
+                    break
+                
+                path.append(candidates[j])
+                dfs(j,t-candidates[j])
+                path.pop()
+        
+        dfs(0,target)
+
+        return res
+```
+
+
+
+
+
+
+
+## [216. 组合总和 III](https://leetcode.cn/problems/combination-sum-iii/)
+
+找出所有相加之和为 `n` 的 `k` 个数的组合，且满足下列条件：
+
+- 只使用数字1到9
+- 每个数字 **最多使用一次** 
+
+返回 *所有可能的有效组合的列表* 。该列表不能包含相同的组合两次，组合可以以任何顺序返回。
+
+ 
+
+**示例 1:**
+
+```
+输入: k = 3, n = 7
+输出: [[1,2,4]]
+解释:
+1 + 2 + 4 = 7
+没有其他符合的组合了。
+```
+
+**示例 2:**
+
+```
+输入: k = 3, n = 9
+输出: [[1,2,6], [1,3,5], [2,3,4]]
+解释:
+1 + 2 + 6 = 9
+1 + 3 + 5 = 9
+2 + 3 + 4 = 9
+没有其他符合的组合了。
+```
+
+**示例 3:**
+
+```
+输入: k = 4, n = 1
+输出: []
+解释: 不存在有效的组合。
+在[1,9]范围内使用4个不同的数字，我们可以得到的最小和是1+2+3+4 = 10，因为10 > 1，没有有效的组合。
+```
+
+ 
+
+**提示:**
+
+- `2 <= k <= 9`
+- `1 <= n <= 60`
+
+
+
+```python
+class Solution:
+    def combinationSum3(self, k: int, n: int) -> List[List[int]]:
+        res = []
+        path = []
+
+        def dfs(i, t):
+            d = k - len(path)
+            if t < 0 or t > (2*i - d + 1) * d  // 2:
+                return
+            if len(path) == k:
+                res.append(path.copy())
+                return
+            
+            for j in range(i, d-1, -1):
+                path.append(j)
+                dfs(j-1, t-j)
+                path.pop()
+        
+        dfs(9, n)
+        return res
+```
+
+
+
+
+
+## [78. 子集](https://leetcode.cn/problems/subsets/)
+
+给你一个整数数组 `nums` ，数组中的元素 **互不相同** 。返回该数组所有可能的子集（幂集）。
+
+解集 **不能** 包含重复的子集。你可以按 **任意顺序** 返回解集。
+
+
+
+**示例 1：**
+
+```
+输入：nums = [1,2,3]
+输出：[[],[1],[2],[1,2],[3],[1,3],[2,3],[1,2,3]]
+```
+
+**示例 2：**
+
+```
+输入：nums = [0]
+输出：[[],[0]]
+```
+
+ 
+
+**提示：**
+
+- `1 <= nums.length <= 10`
+- `-10 <= nums[i] <= 10`
+- `nums` 中的所有元素 **互不相同**
+
+
+
+```python
+class Solution:
+    def subsets(self, nums: List[int]) -> List[List[int]]:
+        res = []
+        path = []
+        n = len(nums)
+
+        def dfs(i):
+            if i == n:
+                res.append(path.copy())
+                return
+            
+            dfs(i+1) # 不选
+
+            path.append(nums[i])
+            dfs(i+1) # 选
+            path.pop() # 恢复现场
+        
+        dfs(0)
+        return res
+```
+
+
+
+从答案的视角出发
+
+```python
+class Solution:
+    def subsets(self, nums: List[int]) -> List[List[int]]:
+        res = []
+        path = []
+        n = len(nums)
+
+        def dfs(i):
+            res.append(path.copy())
+
+            for j in range(i, n):
+                path.append(nums[j])
+                dfs(j+1)
+                path.pop()
+        
+        dfs(0)
+        return res
+```
+
+
+
+## [131. 分割回文串](https://leetcode.cn/problems/palindrome-partitioning/)
+
+给你一个字符串 `s`，请你将 `s` 分割成一些子串，使每个子串都是 **回文串** 。返回 `s` 所有可能的分割方案。
+
+**回文串** 是正着读和反着读都一样的字符串。
+
+ 
+
+**示例 1：**
+
+```
+输入：s = "aab"
+输出：[["a","a","b"],["aa","b"]]
+```
+
+**示例 2：**
+
+```
+输入：s = "a"
+输出：[["a"]]
+```
+
+ 
+
+**提示：**
+
+- `1 <= s.length <= 16`
+- `s` 仅由小写英文字母组成
+
+
+
+```python
+class Solution:
+    def partition(self, s: str) -> List[List[str]]:
+        res = []
+        path = []
+        n = len(s)
+        def dfs(i):
+            if i == n:
+                res.append(path.copy())
+                return 
+            
+            for j in range(i,n):
+                t = s[i:j+1]
+                if t == t[::-1]:
+                    path.append(t)
+                    dfs(j+1)
+                    path.pop()
+        
+        dfs(0)
+        return res
+```
+
+
+
+## [199. 二叉树的右视图](https://leetcode.cn/problems/binary-tree-right-side-view/)
+
+
+
+给定一个二叉树的 **根节点** `root`，想象自己站在它的右侧，按照从顶部到底部的顺序，返回从右侧所能看到的节点值。
+
+**示例 1:**
+
+```
+输入: [1,2,3,null,5,null,4]
+输出: [1,3,4]
+```
+
+**示例 2:**
+
+```
+输入: [1,null,3]
+输出: [1,3]
+```
+
+**示例 3:**
+
+```
+输入: []
+输出: []
+```
+
+**提示:**
+
+- 二叉树的节点个数的范围是 `[0,100]`
+- `-100 <= Node.val <= 100` 
+
+
+
+```python
+# Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution:
+    def rightSideView(self, root: Optional[TreeNode]) -> List[int]:
+        res = []
+        def f(node, depth):
+            if node is None:
+                return 
+            if depth == len(res):
+                res.append(node.val)
+            f(node.right,depth+1)
+            f(node.left, depth+1)
+        f(root, 0)
+        return res
+```
+
+
+
+## [46. 全排列](https://leetcode.cn/problems/permutations/)
+
+给定一个不含重复数字的数组 `nums` ，返回其 *所有可能的全排列* 。你可以 **按任意顺序** 返回答案。
+
+ 
+
+**示例 1：**
+
+```
+输入：nums = [1,2,3]
+输出：[[1,2,3],[1,3,2],[2,1,3],[2,3,1],[3,1,2],[3,2,1]]
+```
+
+**示例 2：**
+
+```
+输入：nums = [0,1]
+输出：[[0,1],[1,0]]
+```
+
+**示例 3：**
+
+```
+输入：nums = [1]
+输出：[[1]]
+```
+
+ 
+
+**提示：**
+
+- `1 <= nums.length <= 6`
+- `-10 <= nums[i] <= 10`
+- `nums` 中的所有整数 **互不相同**
+
+```python
+class Solution:
+    def permute(self, nums: List[int]) -> List[List[int]]:
+        n = len(nums)
+        res = []
+        path = [0] * n
+        
+        def dfs(i, s):
+            if i == n:
+                res.append(path.copy())
+                return
+            
+            for x in s:
+                path[i] = x
+                dfs(i+1, s-{x})
+        
+        dfs(0, set(nums))
+        return res
+```
+
+
+
+
+
+## [47. 全排列 II](https://leetcode.cn/problems/permutations-ii/)
+
+给定一个可包含重复数字的序列 `nums` ，***按任意顺序*** 返回所有不重复的全排列。
+
+ 
+
+**示例 1：**
+
+```
+输入：nums = [1,1,2]
+输出：
+[[1,1,2],
+ [1,2,1],
+ [2,1,1]]
+```
+
+**示例 2：**
+
+```
+输入：nums = [1,2,3]
+输出：[[1,2,3],[1,3,2],[2,1,3],[2,3,1],[3,1,2],[3,2,1]]
+```
+
+ 
+
+**提示：**
+
+- `1 <= nums.length <= 8`
+- `-10 <= nums[i] <= 10`
+
+
+
+```python
+class Solution:
+    def permuteUnique(self, nums: List[int]) -> List[List[int]]:
+        nums.sort()
+
+        res = []
+        path = []
+
+        n = len(nums)
+
+        visited = set()
+
+        def dfs(path, nums):
+            if len(path) == n:
+                res.append(path)
+                return
+            for i in range(n):
+                if i in visited or (i > 0 and i - 1 not in visited and nums[i-1] == nums[i] ):
+                    continue
+                visited.add(i)
+                dfs(path+[nums[i]],nums)
+                visited.remove(i)
+        dfs([], nums)
+        return res
+```
+
